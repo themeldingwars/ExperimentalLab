@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BBFD87E2-B5DF-43C7-B7B8-38038E7087E7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FFNet</RootNamespace>
+    <AssemblyName>FFNet</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.11\lib\net45\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FFMatrix.cs" />
+    <Compile Include="FFSocket.cs" />
+    <Compile Include="Packets\Gss\Fury Messages\BaseFuryMsg.cs" />
+    <Compile Include="Packets\Gss\Proto Packets\Ack.cs" />
+    <Compile Include="Packets\MessageNamesLookup.cs" />
+    <Compile Include="Packets\Gss\Fury Messages\FuryUnknownMsg.cs" />
+    <Compile Include="Packets\Gss\GssHeader.cs" />
+    <Compile Include="Packets\Gss\GssUnknown.cs" />
+    <Compile Include="Packets\Gss\Proto Packets\BaseProtoMsg.cs" />
+    <Compile Include="Packets\Gss\Proto Packets\CloseConnectionMsg.cs" />
+    <Compile Include="Packets\Gss\Proto Packets\TimeSyncRequest.cs" />
+    <Compile Include="Packets\Gss\Proto Packets\TimeSyncResponse.cs" />
+    <Compile Include="Packets\Matrix\AbortMsg.cs" />
+    <Compile Include="Packets\Matrix\BaseMatrixMessage.cs" />
+    <Compile Include="Packets\Matrix\HeheMsg.cs" />
+    <Compile Include="Packets\Matrix\HuggMsg.cs" />
+    <Compile Include="Packets\Matrix\KissMsg.cs" />
+    <Compile Include="Packets\Matrix\PokeMsg.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\MicroEpoch.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Flare\Flare.csproj">
+      <Project>{a4aadd02-224a-4f38-99c6-506a4464a144}</Project>
+      <Name>Flare</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

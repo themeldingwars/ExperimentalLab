@@ -1,0 +1,13 @@
+{
+  "name": "dev-web-api",
+  "version": "0.0.0",
+  "description": "DevWebAPI",
+  "main": "app.js",
+  "author": {
+    "name": "Arkii"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3"
+  }
+}
