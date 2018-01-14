@@ -90,7 +90,11 @@ namespace PacketPeep
                 pckLog.Data = new byte[udpPacket.Bytes.Length - 8];
                 Array.Copy(udpPacket.Bytes, 8, pckLog.Data, 0, pckLog.Data.Length);
 
-                Packets.Add(pckLog);
+                // Filter to only firefall packets
+                if (!HasGottenAllMatrixMessages || IsFromServer(ipPacket.SourceAddress) || IsFromClient(ipPacket.SourceAddress))
+                {
+                    Packets.Add(pckLog);
+                }
             }
         }
 
