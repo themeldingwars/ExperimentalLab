@@ -11,6 +11,8 @@ using System.Diagnostics;
 using Be.Windows.Forms;
 using FFNet.Packets.Gss.Proto_Packets;
 using FFNet;
+using FFNet.Packets.Matrix;
+using FFNet.Packets.Gss.Fury_Messages;
 
 namespace PacketPeep
 {
@@ -40,6 +42,7 @@ namespace PacketPeep
             new byte[] {223, 147, 112}
         };
 
+        private int HexHighlightColorIdx = 0;
         private byte[][] HexHiglightColors = new byte[][]
         {
             new byte[] {125,62,25},
@@ -110,20 +113,12 @@ namespace PacketPeep
         // Sate vars
         //----------------------------------------------------
         private PacketRecord CurrentSelectedPacket { get; set; } = new PacketRecord() { };
-        private FFSocket ParsingSock = null;
         private List<PacketRecord> PacketRecords = new List<PacketRecord>();
-        private PacketRecord TempRawParentPacket { get; set; } = new PacketRecord() { };
         private int RawPacketIdx = 0;
 
         public PacketInspector()
         {
             InitializeComponent();
-
-            ParsingSock = new FFSocket();
-            ParsingSock.Mode = Mode.NoReply;
-            ParsingSock.OnMatrixMsgRecv += ParsingSock_OnMatrixMsgRecv;
-            ParsingSock.OnGssProtoMsgRecv += ParsingSock_OnGssProtoMsgRecv;
-            ParsingSock.OnGssRawMsgRecv += ParsingSock_OnGssRawMsgRecv;
 
             HexView.ByteProvider = new DynamicByteProvider(new byte[] { });
             PacketList.View = View.Details;
@@ -149,77 +144,83 @@ namespace PacketPeep
         {
             if (PacketBytes != null)
             {
-                // Try to decode it
-                //ParsingSock.HandleMessage(PacketBytes, null);
+                var packets = PacketParser.Decode(PacketBytes);
 
-                var pckRecord = new PacketRecord()
+                foreach (var packetMeta in packets)
                 {
-                    IsRawNetworkPacket = true,
-                    ParentPacketIdx = -1,
-                    Source = PacketFrom.Server,
-                    Data = PacketBytes
-                };
+                    if (packetMeta.PacketType == PacketParser.PacketTypes.MATRIX)
+                    {
 
-                AddPacketRecordToUI(pckRecord);
+                    }
+                }
             }
         }
 
         public void AddPacketRecordToUI(PacketRecord Record)
         {
-
-            if (Record.IsMatrixMessage)
-            {
-                Record.Name = "Matrix Message";
-            }
-            else
-            {
-                Record.Name = "GSS Message";
-            }
-
-            AddPacketLogToList(Record.Source == PacketFrom.Server, RawPacketIdx, Record.Name);
+            // Raw packet header
+            Record.Name = Record.IsMatrixMessage ? "Matrix Message" : "GSS Message";
+            var isFromServer = Record.Source == PacketFrom.Server;
+            AddPacketLogToList(isFromServer, RawPacketIdx, Record.Name);
             PacketRecords.Add(Record);
             Record.Index = PacketRecords.Count - 1;
-            TempRawParentPacket = Record;
-            ParsingSock.HandleMessage(Record.Data, null);
             RawPacketIdx++;
-        }
 
-        private void AddSubPacket(PacketRecord ParentPacket, PacketRecord ChildPacket)
-        {
-            ChildPacket.ParentPacketIdx = ParentPacket.Index;
-            ChildPacket.Source = ParentPacket.Source;
-            AddPacketLogToList(ChildPacket.Source == PacketFrom.Server, PacketRecords.Count, ChildPacket.Name, ChildPacket.ParentPacketIdx);
-            PacketRecords.Add(ChildPacket);
-        }
+            // Now the sub packets
+            var packets = PacketParser.Decode(Record.Data, true);
 
-        private void ParsingSock_OnMatrixMsgRecv(FFNet.Packets.Matrix.BaseMatrixMessage Msg, System.Net.IPEndPoint From, byte[] RawBytes = null)
-        {
-            //InspectorPropertyGrid.SelectedObject = Msg;
-            AddSubPacket(TempRawParentPacket, new PacketRecord()
+            if (packets != null)
             {
-                Data = RawBytes,
-                Name = new string(Msg.Type)
-            });
-        }
+                foreach (var packetMeta in packets)
+                {
+                    if (packetMeta.PacketType == PacketParser.PacketTypes.MATRIX)
+                    {
+                        PacketRecord subRecord = new PacketRecord();
+                        var matrixMessage = packetMeta.Packet as BaseMatrixMessage;
+                        var name = new string(matrixMessage.Type);
+                        subRecord.Data = packetMeta.Debug.RawBytes;
+                        subRecord.Packet = matrixMessage;
 
-        private void ParsingSock_OnGssProtoMsgRecv(FFNet.Packets.Gss.GssHeader Header, BaseProtoMsg GssMessage, FFSocket Socket)
-        {
-            //throw new NotImplementedException();
-        }
+                        var color = GetNextHexHighlightColor();
+                        AddPacketLogToList(isFromServer, PacketRecords.Count, name, Record.Index, color);
+                        PacketRecords.Add(subRecord);
 
-        private void ParsingSock_OnGssRawMsgRecv(FFNet.Packets.Gss.GssHeader Header, FFNet.Packets.Gss.GssUnknown GssMessage, FFSocket Socket)
-        {
-            AddSubPacket(TempRawParentPacket, new PacketRecord()
-            {
-                Data = GssMessage.Payload,
-                Name = "Unknow"
-            });
+                        Record.HexHighLights.Add(new HexBox.HighlightedRegion((int)packetMeta.Debug.Offset, packetMeta.Debug.RawBytes.Length, color));
+                    }
+                    else if (packetMeta.PacketType == PacketParser.PacketTypes.PROTO)
+                    {
+                        PacketRecord subRecord = new PacketRecord();
+                        var protoMessage = packetMeta.Packet as BaseProtoMsg;
+                        subRecord.Data = packetMeta.Debug.RawBytes;
+                        subRecord.Packet = protoMessage;
+
+                        var color = GetNextHexHighlightColor();
+                        AddPacketLogToList(isFromServer, PacketRecords.Count, protoMessage.MsgName, Record.Index, color);
+                        PacketRecords.Add(subRecord);
+
+                        Record.HexHighLights.Add(new HexBox.HighlightedRegion((int)packetMeta.Debug.Offset, packetMeta.Debug.RawBytes.Length, color));
+                    }
+                    else if (packetMeta.PacketType == PacketParser.PacketTypes.UNKNOWN)
+                    {
+                        PacketRecord subRecord = new PacketRecord();
+                        var protoMessage = packetMeta.Packet as FuryUnknownMsg;
+                        subRecord.Data = packetMeta.Debug.RawBytes;
+                        subRecord.Packet = protoMessage;
+
+                        var color = GetNextHexHighlightColor();
+                        AddPacketLogToList(isFromServer, PacketRecords.Count, protoMessage.MsgName, Record.Index, color);
+                        PacketRecords.Add(subRecord);
+
+                        Record.HexHighLights.Add(new HexBox.HighlightedRegion((int)packetMeta.Debug.Offset, packetMeta.Debug.RawBytes.Length, color));
+                    }
+                }
+            }
         }
 
         private void SetColumWidths()
         {
             int col1 = 40;
-            int col2 = 40;
+            int col2 = 8;
             int col3 = MainSplitter.SplitterDistance - (col1 + col2 +
                     (IsPacketListHorzScrollShown() ? SystemInformation.VerticalScrollBarWidth : 0)
                 ) + 5;
@@ -286,7 +287,7 @@ namespace PacketPeep
             var children = InspectorPropertyGrid.Controls.OfType<Control>();
         }
 
-        private int AddPacketLogToList(bool FromServer, int Idx, string Name, long ParentPacketIdx = -1)
+        private int AddPacketLogToList(bool FromServer, int Idx, string Name, long ParentPacketIdx = -1, Color? AccentColor = null)
         {
             Color foreColor = Color.WhiteSmoke;
 
@@ -301,15 +302,21 @@ namespace PacketPeep
             item.UseItemStyleForSubItems = false;
 
             string idxStr = ParentPacketIdx == -1 ? $"{Idx}" : "";
-            item.SubItems.Add(idxStr, foreColor, subItemColor, Font);
+            item.SubItems.Add(idxStr, foreColor, AccentColor == null ? subItemColor : AccentColor.Value, Font);
 
             item.SubItems.Add(Name, foreColor, subItemColor, Font);
 
             int listItemIdx = PacketList.Items.Add(item).Index;
 
-            PacketList.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            //PacketList.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
 
             return listItemIdx;
+        }
+
+        public void Clear()
+        {
+            PacketList.Items.Clear();
+            PacketRecords.Clear();
         }
 
         private Color GetNextColor()
@@ -319,6 +326,18 @@ namespace PacketPeep
             if (PacketColorIdx >= PacketIDColors.Length) { PacketColorIdx = 0; }
 
             var rgb = PacketIDColors[PacketColorIdx];
+            var color = GetColorFromRGBArr(rgb);
+
+            return color;
+        }
+
+        private Color GetNextHexHighlightColor()
+        {
+            // Get index for the color
+            HexHighlightColorIdx++;
+            if (HexHighlightColorIdx >= PacketIDColors.Length) { HexHighlightColorIdx = 0; }
+
+            var rgb = PacketIDColors[HexHighlightColorIdx];
             var color = GetColorFromRGBArr(rgb);
 
             return color;
@@ -364,6 +383,9 @@ namespace PacketPeep
 
                 ValueDisplayLE.ParseBytes(selectedBytes);
                 ValueDisplayBE.ParseBytes(selectedBytes);
+
+                HexSelOffset.Text = $"Offset: {HexView.SelectionStart}";
+                HexSelLen.Text = $"Sel Len: {HexView.SelectionLength}";
             }
         }
 
@@ -375,8 +397,21 @@ namespace PacketPeep
                 CurrentSelectedPacket = PacketRecords[selectedIdx];
 
                 HexView.ByteProvider.DeleteBytes(0, HexView.ByteProvider.Length);
-                HexView.ByteProvider.InsertBytes(0, CurrentSelectedPacket.Data);
+                if (CurrentSelectedPacket.Data != null)
+                {
+                    HexView.HighligedRegions = CurrentSelectedPacket.HexHighLights;
+                    HexView.ByteProvider.InsertBytes(0, CurrentSelectedPacket.Data);
+                }
                 HexView.Refresh();
+
+                if (CurrentSelectedPacket.Packet != null)
+                {
+                    InspectorPropertyGrid.SelectedObject = CurrentSelectedPacket.Packet;
+                }
+                else
+                {
+                    InspectorPropertyGrid.SelectedObject = null;
+                }
             }
         }
     }

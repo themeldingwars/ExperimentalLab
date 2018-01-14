@@ -67,7 +67,7 @@ namespace FFNet.Packets.Gss.Fury_Messages
         public static string GetMatrixFuryName(int Id)
         {
             const int offset = 17;
-            if (Id >= offset && Id <= matrix_fury.Length + offset)
+            if (Id >= offset && Id < matrix_fury.Length + offset)
             {
                 return matrix_fury[Id - offset];
             }

@@ -12,6 +12,7 @@ namespace FFNet.Packets.Gss.Proto_Packets
     {
         public const byte MSG_ID = 0x2;
         public override byte? MsgID { get { return MSG_ID; } }
+        public override string MsgName { get { return "Ack"; } }
 
         public ushort SeqNum { get; set; }
         public ushort AckFor { get; set; }

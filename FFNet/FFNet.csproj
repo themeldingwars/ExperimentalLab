@@ -46,8 +46,11 @@
   <ItemGroup>
     <Compile Include="FFMatrix.cs" />
     <Compile Include="FFSocket.cs" />
+    <Compile Include="PacketParser.cs" />
+    <Compile Include="Packets\BasePacket.cs" />
     <Compile Include="Packets\Gss\Fury Messages\BaseFuryMsg.cs" />
     <Compile Include="Packets\Gss\Proto Packets\Ack.cs" />
+    <Compile Include="Packets\Gss\Proto Packets\UnkProtoMsg.cs" />
     <Compile Include="Packets\MessageNamesLookup.cs" />
     <Compile Include="Packets\Gss\Fury Messages\FuryUnknownMsg.cs" />
     <Compile Include="Packets\Gss\GssHeader.cs" />

@@ -59,17 +59,20 @@ namespace FFNet.Packets.Gss
 
         public void Read(Reader R)
         {
-            Flags = R.Byte();
-            LenByte = R.Byte();
+            if (CanReadHeaderBasicLength(R))
+            {
+                Flags = R.Byte();
+                LenByte = R.Byte();
 
-            if (IsProtocolPacket)
-            {
-                MsgID = ReadResentByte(R);
-            }
-            else // Has a seq num
-            {
-                SeqNum = R.UShort();
-                MsgID = ReadResentByte(R);
+                if (IsProtocolPacket)
+                {
+                    MsgID = ReadResentByte(R);
+                }
+                else if ((R.Length - R.Position) > 3) // Has a seq num and enough to read the header
+                {
+                    SeqNum = R.UShort();
+                    MsgID = ReadResentByte(R);
+                }
             }
         }
 
@@ -87,6 +90,11 @@ namespace FFNet.Packets.Gss
                 W.UShort(SeqNum);
                 W.Byte(MsgID);
             }
+        }
+
+        private bool CanReadHeaderBasicLength(Reader R)
+        {
+            return (R.Length - R.Position) > 3;
         }
 
         private byte ReadResentByte(Reader R)

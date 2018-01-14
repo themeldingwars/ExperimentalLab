@@ -32,6 +32,8 @@ namespace PacketPeep
             var capLoader = new PcapLoader(FilePath);
             var packets = capLoader.GetPacketBytes();
 
+            PacketInspector.Clear();
+
             foreach (var packetBytes in packets)
             {
                 PacketInspector.AddPacketRecordToUI(new PacketRecord()

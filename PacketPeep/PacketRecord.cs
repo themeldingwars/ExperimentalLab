@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Be.Windows.Forms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,5 +24,7 @@ namespace PacketPeep
         public long Index;
         public bool IsMatrixMessage;
         public object Packet;
+
+        public List<HexBox.HighlightedRegion> HexHighLights = new List<HexBox.HighlightedRegion>();
     }
 }

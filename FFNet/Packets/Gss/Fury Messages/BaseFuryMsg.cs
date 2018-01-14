@@ -7,13 +7,20 @@ using System.Threading.Tasks;
 
 namespace FFNet.Packets.Gss.Fury_Messages
 {
-    public class BaseFuryMsg
+    public class BaseFuryMsg : BasePacket
     {
-        public virtual byte? MsgID { get { return null; } }
+        public GssHeader Header { get; set; }
+        //public virtual byte? MsgID { get { return null; } }
+        public virtual string MsgName { get { return Header == null ? "Unk Fury Msg" : MessageNamesLookup.GetMatrixFuryName(Header.MsgID); } }
 
         public BaseFuryMsg()
         {
 
+        }
+
+        public BaseFuryMsg(GssHeader Header)
+        {
+            this.Header = Header;
         }
 
         public virtual void Read(Reader R)

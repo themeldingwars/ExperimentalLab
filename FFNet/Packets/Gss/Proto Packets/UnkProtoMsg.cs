@@ -5,33 +5,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FFNet.Packets.Gss.Fury_Messages
+namespace FFNet.Packets.Gss.Proto_Packets
 {
-    public class FuryUnknownMsg : BaseFuryMsg
+    // Just read and store the unknown bytes
+    public class UnkProtoMsg : BaseProtoMsg
     {
-        public byte[] Payload { get; set; }
+        public override string MsgName { get { return "Unk Proto Msg"; } }
         private int Length = 0;
+        public byte[] Bytes = null;
 
-        public FuryUnknownMsg()
+        public UnkProtoMsg()
         {
 
         }
 
-        public FuryUnknownMsg(GssHeader Header, Reader R, int? Length = null)
+        public UnkProtoMsg(Reader R, int? Length = null)
         {
-            this.Header = Header;
             Length = Length.Value;
             Read(R);
         }
 
         public override void Read(Reader R)
         {
-            Payload = R.Byte(Length);
+            Bytes = R.Byte(Length);
         }
 
         public override void Write(Writer W)
         {
-            W.Byte(Payload);
+            W.Byte(Bytes);
         }
     }
 }

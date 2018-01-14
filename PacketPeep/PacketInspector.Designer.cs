@@ -40,6 +40,9 @@
             this.ValueDisplayLE = new PacketPeep.ValueDisplay();
             this.ValueDisplayBE = new PacketPeep.ValueDisplay();
             this.InspectorPropertyGrid = new System.Windows.Forms.PropertyGrid();
+            this.darkStatusStrip1 = new DarkUI.Controls.DarkStatusStrip();
+            this.HexSelOffset = new System.Windows.Forms.ToolStripStatusLabel();
+            this.HexSelLen = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.MainSplitter)).BeginInit();
             this.MainSplitter.Panel1.SuspendLayout();
             this.MainSplitter.Panel2.SuspendLayout();
@@ -53,6 +56,7 @@
             this.HexSplitter.Panel2.SuspendLayout();
             this.HexSplitter.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
+            this.darkStatusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainSplitter
@@ -116,7 +120,7 @@
             // Idx
             // 
             this.Idx.Text = "Idx";
-            this.Idx.Width = 79;
+            this.Idx.Width = 5;
             // 
             // PacketName
             // 
@@ -153,6 +157,7 @@
             // 
             // HexSplitter.Panel1
             // 
+            this.HexSplitter.Panel1.Controls.Add(this.darkStatusStrip1);
             this.HexSplitter.Panel1.Controls.Add(this.HexView);
             // 
             // HexSplitter.Panel2
@@ -165,10 +170,11 @@
             // 
             // HexView
             // 
+            this.HexView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.HexView.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(63)))), ((int)(((byte)(65)))));
             this.HexView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.HexView.ColumnInfoVisible = true;
-            this.HexView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.HexView.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.HexView.ForeColor = System.Drawing.SystemColors.ControlLight;
             this.HexView.GroupSeparatorVisible = true;
@@ -178,7 +184,7 @@
             this.HexView.ReadOnly = true;
             this.HexView.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(11)))), ((int)(((byte)(103)))), ((int)(((byte)(216)))));
             this.HexView.ShadowSelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(60)))), ((int)(((byte)(188)))), ((int)(((byte)(255)))));
-            this.HexView.Size = new System.Drawing.Size(975, 800);
+            this.HexView.Size = new System.Drawing.Size(975, 776);
             this.HexView.StringViewVisible = true;
             this.HexView.TabIndex = 0;
             this.HexView.UseFixedBytesPerLine = true;
@@ -241,6 +247,35 @@
             this.InspectorPropertyGrid.ViewBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(63)))), ((int)(((byte)(65)))));
             this.InspectorPropertyGrid.ViewForeColor = System.Drawing.SystemColors.ControlLight;
             // 
+            // darkStatusStrip1
+            // 
+            this.darkStatusStrip1.AutoSize = false;
+            this.darkStatusStrip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(63)))), ((int)(((byte)(65)))));
+            this.darkStatusStrip1.Font = new System.Drawing.Font("Verdana", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.darkStatusStrip1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
+            this.darkStatusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.HexSelOffset,
+            this.HexSelLen});
+            this.darkStatusStrip1.Location = new System.Drawing.Point(0, 775);
+            this.darkStatusStrip1.Name = "darkStatusStrip1";
+            this.darkStatusStrip1.Padding = new System.Windows.Forms.Padding(0, 5, 0, 3);
+            this.darkStatusStrip1.Size = new System.Drawing.Size(975, 25);
+            this.darkStatusStrip1.SizingGrip = false;
+            this.darkStatusStrip1.TabIndex = 1;
+            this.darkStatusStrip1.Text = "darkStatusStrip1";
+            // 
+            // HexSelOffset
+            // 
+            this.HexSelOffset.Name = "HexSelOffset";
+            this.HexSelOffset.Size = new System.Drawing.Size(53, 12);
+            this.HexSelOffset.Text = "Offset:";
+            // 
+            // HexSelLen
+            // 
+            this.HexSelLen.Name = "HexSelLen";
+            this.HexSelLen.Size = new System.Drawing.Size(61, 12);
+            this.HexSelLen.Text = "Sel Len:";
+            // 
             // PacketInspector
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
@@ -264,6 +299,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.HexSplitter)).EndInit();
             this.HexSplitter.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
+            this.darkStatusStrip1.ResumeLayout(false);
+            this.darkStatusStrip1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -282,5 +319,8 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private ValueDisplay ValueDisplayLE;
         private ValueDisplay ValueDisplayBE;
+        private DarkUI.Controls.DarkStatusStrip darkStatusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel HexSelOffset;
+        private System.Windows.Forms.ToolStripStatusLabel HexSelLen;
     }
 }

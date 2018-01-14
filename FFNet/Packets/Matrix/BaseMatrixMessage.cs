@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FFNet.Packets.Matrix
 {
-    public class BaseMatrixMessage
+    public class BaseMatrixMessage : BasePacket
     {
         public char[] Type;
 
